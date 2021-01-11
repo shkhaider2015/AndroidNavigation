@@ -4,9 +4,13 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabItem;
@@ -15,12 +19,12 @@ import com.google.android.material.tabs.TabLayout;
 public class MainActivity extends AppCompatActivity {
 
 
+    private static final String TAG = "MainActivity";
     ActionBarDrawerToggle toggle;
     NavigationView navigationView;
-    ViewPager pager;
     TabLayout mTabLayout;
-    TabItem firstItem,secondItem,thirdItem;
-    com.example.androidnavigation.PagerAdapter adapter;
+
+    int back = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +34,14 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        pager = findViewById(R.id.viewpager);
         mTabLayout = findViewById(R.id.tablayout);
 
-        firstItem = findViewById(R.id.firstItem);
-        secondItem = findViewById(R.id.secondItem);
-        thirdItem = findViewById(R.id.thirditem);
+        NavController navController = Navigation.findNavController(this, R.id.fragment);
+
+        NavOptions navOptions = new NavOptions.Builder()
+                .setLaunchSingleTop(true)
+                .setPopUpTo(navController.getGraph().getStartDestination(), false)
+                .build();
 
 
 
@@ -43,27 +49,57 @@ public class MainActivity extends AppCompatActivity {
 //        toggle.setDrawerIndicatorEnabled(true);
 //        toggle.syncState();
 
-        adapter = new PagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT,mTabLayout.getTabCount());
-        pager.setAdapter(adapter);
 
-        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                pager.setCurrentItem(tab.getPosition());
-            }
+            mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
+                    Log.d(TAG, "onTabSelected: TAN : " + tab.getText());
+                    switch (tab.getPosition())
+                    {
+                        case 0:
+                            //
+                            navController.navigate(R.id.fragmentOne, null, navOptions);
+                            break;
+                        case 1:
+                            //
+                            navController.navigate(R.id.fragmentTwo, null, navOptions);
+                            break;
+                        case 2:
+                            //
+                            navController.navigate(R.id.fragmentThree, null, navOptions);
+                            break;
+                    }
 
-            }
+                }
 
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
 
-            }
-        });
+                }
 
-        pager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+
+                }
+            });
+
+    }
+
+    @Override
+    public void onBackPressed() {
+
+
+
+        if(back == 0)
+        {
+            mTabLayout.getTabAt(0).select();
+            back++;
+        }
+        else
+        {
+            super.onBackPressed();
+        }
 
     }
 }
